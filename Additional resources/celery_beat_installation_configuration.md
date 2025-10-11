@@ -90,7 +90,7 @@ PeriodicTask.objects.create(
 From your project root:
 
 ```bash
-celery -A architecture_portal beat --loglevel=info
+celery -A your_project_name beat --loglevel=info
 ```
 
 This starts the scheduler, which pushes periodic tasks into the Celery queue.
@@ -102,7 +102,7 @@ This starts the scheduler, which pushes periodic tasks into the Celery queue.
 Ensure you also have a Celery worker running to process tasks:
 
 ```bash
-celery -A architecture_portal worker --loglevel=info
+celery -A your_project_name worker --loglevel=info
 ```
 
 ---
@@ -112,7 +112,7 @@ celery -A architecture_portal worker --loglevel=info
 You can combine both for development:
 
 ```bash
-celery -A architecture_portal worker --beat --loglevel=info
+celery -A your_project_name worker --beat --loglevel=info
 ```
 
 > Note: For production, it’s better to run Beat and Worker as separate services.
