@@ -42,11 +42,26 @@ python manage.py migrate
 
 ## 5. Configure Celery Beat Scheduler
 
-In `settings.py`, tell Celery to use the database scheduler:
+In `settings.py`, tell Celery to use the **database scheduler** (recommended for Django):
 
 ```python
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 ```
+
+### 🔧 Other Available Scheduler Options
+
+Celery supports multiple schedulers — you can choose one depending on your setup:
+
+| Scheduler                                         | Description                                                                                     | Usage Example                                           |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `celery.beat:PersistentScheduler`                 | Default file-based scheduler that stores schedule data in a local file (`celerybeat-schedule`). | `CELERY_BEAT_SCHEDULE_FILENAME = 'celerybeat-schedule'` |
+| `django_celery_beat.schedulers:DatabaseScheduler` | Stores schedules in Django’s database (recommended).                                            | *(shown above)*                                         |
+| Custom Scheduler                                  | You can define your own scheduler by subclassing `celery.beat.Scheduler`.                       | e.g., `myapp.schedulers:CustomScheduler`                |
+
+> 💡 **Tip:**
+>
+> * Use the **database scheduler** for shared or production environments.
+> * Use the **persistent scheduler** for local development or lightweight setups.
 
 ---
 
