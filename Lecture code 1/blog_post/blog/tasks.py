@@ -1,3 +1,6 @@
+import time
+
+from billiard.exceptions import SoftTimeLimitExceeded
 from celery import shared_task
 from django.core.mail import send_mail
 
@@ -71,3 +74,15 @@ def your_blog_post_is_deleted_email(email: str, blog_post_title: str):
         recipient_list=[email],
     )
     return f"Email sent"
+
+
+@shared_task(soft_time_limit=5)  # allow up to 5 seconds
+def test_soft_time_limit():
+    try:
+        print("Task started.")
+        for i in range(10):
+            print(f"Step {i+1}")
+            time.sleep(1)  # simulate long-running work
+        print("Task finished successfully.")
+    except SoftTimeLimitExceeded:
+        print("⚠️ Task took too long and was interrupted!")
