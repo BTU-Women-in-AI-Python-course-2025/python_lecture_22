@@ -48,4 +48,15 @@ def send_blog_post_to_email(email: str, blog_post_id: int):
         )
         return f"Email sent to {blog_post.title}"
     except BlogPost.DoesNotExist:
-        return f"Order with ID {blog_post_id} not found."
+        return f"Blog Post with ID {blog_post_id} not found."
+
+@shared_task
+def send_to_email_active_blog_post_count(email: str):
+    blog_post_count = BlogPost.objects.filter(active=True).count()
+    send_mail(
+        subject="Active Blog Post Count",
+        message=f"Active Blog Post Count - {blog_post_count}",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[email],
+    )
+    return f"Email sent"
