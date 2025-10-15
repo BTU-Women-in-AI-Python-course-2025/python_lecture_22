@@ -1,12 +1,14 @@
+from datetime import timedelta
+
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+from django.utils import timezone
 from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 
 from blog.filter_set import BlogPostFilter
-from blog.tasks import delete_blog_post, reorder_blog_post, add_banner_image, send_blog_post_to_email
 from blog.models import BlogPost, Author
 from blog.pagination import BlogPostPagination, BlogPostCursorPagination
 from blog.permissions import ReadOnlyOrAdminOrOwner
@@ -20,7 +22,13 @@ from blog.serializers import (
     BlogPostBannerSerializer,
     SendBlogPostEmailSerializer
 )
-
+from blog.tasks import (
+    delete_blog_post,
+    reorder_blog_post,
+    add_banner_image,
+    send_blog_post_to_email,
+    your_blog_post_is_deleted_email
+)
 
 class BlogPostListViewSet(mixins.ListModelMixin,
                          viewsets.GenericViewSet):
@@ -103,6 +111,11 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         instance.deleted = True
         instance.save()
+        for author in instance.authors.all():
+            your_blog_post_is_deleted_email.apply_async(
+                args=[author.email, instance.title],
+                eta=timezone.now() + timedelta(minutes=10)
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=['post'])  # for detail route

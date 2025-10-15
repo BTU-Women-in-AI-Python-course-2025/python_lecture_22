@@ -11,6 +11,8 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # Auto-discover tasks from all installed Django apps
 app.autodiscover_tasks()
 
+# app.conf.task_soft_time_limit = 300
+# app.conf.task_time_limit = 310
 
 @app.task(bind=True)
 def debug_task(self):

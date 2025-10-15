@@ -60,3 +60,14 @@ def send_to_email_active_blog_post_count(email: str):
         recipient_list=[email],
     )
     return f"Email sent"
+
+
+@shared_task
+def your_blog_post_is_deleted_email(email: str, blog_post_title: str):
+    send_mail(
+        subject="Deleted Blog Post",
+        message=f"Your blog post has been deleted - {blog_post_title}",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[email],
+    )
+    return f"Email sent"
