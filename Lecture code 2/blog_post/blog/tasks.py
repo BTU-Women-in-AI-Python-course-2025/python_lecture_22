@@ -15,6 +15,13 @@ def delete_inactive_blog_posts():
     blog_posts_count = BlogPost.objects.filter(is_active=False).count()
     BlogPost.objects.filter(is_active=False).update(deleted=True)
 
+    send_mail(
+        subject=f"Deleted blog posts",
+        message=f"Deleted {blog_posts_count} blog posts",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=["mari.kifshidze@gmail.com"],
+    )
+
     print(f"Deleted {blog_posts_count} blog posts")
 
 
