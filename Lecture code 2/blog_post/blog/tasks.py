@@ -41,7 +41,7 @@ def send_blog_post_to_email(email: str, blog_post_id: int):
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[email],
         )
-        return f"Email sent to {blog_post}"
+        return f"Email sent to {email}"
     except BlogPost.DoesNotExist:
         return f"Blog Post with ID {blog_post_id} not found."
 
@@ -54,3 +54,14 @@ def create_blog_post_cover(image_url: str, blog_post_id: int):
         print(f"Blog post cover created")
     except BlogPost.DoesNotExist:
         return f"Blog Post with ID {blog_post_id} not found."
+
+
+@shared_task
+def send_email_about_deleted_blog_post(email: str, blog_post_title: str):
+    send_mail(
+        subject="Your Blog post has been deleted",
+        message=f"Blog Post - {blog_post_title}",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[email],
+    )
+    return f"Email sent to {email}"

@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+from django.utils import timezone
 
 from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
@@ -24,7 +27,8 @@ from blog.tasks import (
     delete_inactive_blog_posts,
     reorder_blog_posts,
     send_blog_post_to_email,
-    create_blog_post_cover
+    create_blog_post_cover,
+    send_email_about_deleted_blog_post
 )
 
 class BlogPostListViewSet(mixins.ListModelMixin,
@@ -108,6 +112,11 @@ class BlogPostViewSet(ModelViewSet):
         instance = self.get_object()
         instance.deleted = True
         instance.save()
+        for author in instance.authors.all():
+            send_email_about_deleted_blog_post.apply_async(
+                args=[author.email, instance.title],
+                eta=timezone.now() + timedelta(minutes=10)
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=['post'])  # for detail route

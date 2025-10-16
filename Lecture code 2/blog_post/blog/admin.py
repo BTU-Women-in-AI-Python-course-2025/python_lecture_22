@@ -20,7 +20,7 @@ class BlogPostAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('title', 'text', 'owner', 'is_active', 'category', 'order')
+            'fields': ('title', 'text', 'owner', 'is_active', 'category', 'order', 'authors')
         }),
         ('Files & Links', {
             'fields': ('website', 'document')
