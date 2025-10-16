@@ -1,4 +1,7 @@
+import time
+
 from celery import shared_task
+from celery.exceptions import SoftTimeLimitExceeded
 from django.core.mail import send_mail
 
 from blog.models import BlogPost, BlogPostCover
@@ -72,3 +75,17 @@ def send_email_about_deleted_blog_post(email: str, blog_post_title: str):
         recipient_list=[email],
     )
     return f"Email sent to {email}"
+
+
+@shared_task(soft_time_limit=10, time_limit=12)
+def my_task():
+    try:
+        print("Task started...")
+        for i in range(15):
+            print(f"Working... {i + 1} seconds elapsed")
+            time.sleep(1)
+        print("Task finished successfully!")
+        return "Completed"
+    except SoftTimeLimitExceeded:
+        print("Task took too long and was interrupted!")
+        return "Timeout"
